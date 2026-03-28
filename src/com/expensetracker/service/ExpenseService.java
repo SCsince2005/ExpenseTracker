@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// business logic for expenses - validates then delegates storage to ExpenseDAO
 public class ExpenseService {
 
     private final ExpenseDAO expenseDAO;
@@ -21,6 +20,49 @@ public class ExpenseService {
     public void addExpense(Expense expense) throws ExpenseTrackerException {
         validateExpense(expense);
         expenseDAO.insert(expense);
+    }
+
+    public void deleteExpense(int expenseId) throws ExpenseTrackerException {
+        expenseDAO.deleteById(expenseId);
+    }
+
+    public List<Expense> getExpensesByUser(int userId) throws ExpenseTrackerException {
+        return expenseDAO.getByUserId(userId);
+    }
+
+    public List<Expense> getExpensesByCategory(int userId, Category category) throws ExpenseTrackerException {
+        return expenseDAO.getByUserAndCategory(userId, category);
+    }
+
+    public List<Expense> getMonthlyExpenses(int userId, int year, int month) throws ExpenseTrackerException {
+        return expenseDAO.getByUserAndMonth(userId, year, month);
+    }
+
+    public double getTotalByUser(int userId) throws ExpenseTrackerException {
+        return expenseDAO.getTotalByUser(userId);
+    }
+
+    public double getMonthlyTotal(int userId, int year, int month) throws ExpenseTrackerException {
+        return expenseDAO.getMonthlyTotal(userId, year, month);
+    }
+
+    // category-wise breakdown for all time
+    public Map<Category, Double> getCategoryWiseTotals(int userId) throws ExpenseTrackerException {
+        return buildCategoryMap(getExpensesByUser(userId));
+    }
+
+    // category-wise breakdown for a specific month
+    public Map<Category, Double> getMonthlyReport(int userId, int year, int month) throws ExpenseTrackerException {
+        return buildCategoryMap(getMonthlyExpenses(userId, year, month));
+    }
+
+    // reusable helper that takes any list and groups by category using HashMap
+    private Map<Category, Double> buildCategoryMap(List<Expense> expenses) {
+        Map<Category, Double> totals = new HashMap<>();
+        for (Expense expense : expenses) {
+            totals.merge(expense.getCategory(), expense.getAmount(), Double::sum);
+        }
+        return totals;
     }
 
     private void validateExpense(Expense expense) throws ExpenseTrackerException {
@@ -39,27 +81,5 @@ public class ExpenseService {
         if (expense.getUserId() <= 0) {
             throw new ExpenseTrackerException("Must be linked to a valid user.");
         }
-    }
-
-    public List<Expense> getExpensesByUser(int userId) throws ExpenseTrackerException {
-        return expenseDAO.getByUserId(userId);
-    }
-
-    public double getTotalByUser(int userId) throws ExpenseTrackerException {
-        return expenseDAO.getTotalByUser(userId);
-    }
-
-    public List<Expense> getExpensesByCategory(int userId, Category category) throws ExpenseTrackerException {
-        return expenseDAO.getByUserAndCategory(userId, category);
-    }
-
-    // builds a category -> total spending map using HashMap
-    public Map<Category, Double> getCategoryWiseTotals(int userId) throws ExpenseTrackerException {
-        Map<Category, Double> totals = new HashMap<>();
-
-        for (Expense expense : getExpensesByUser(userId)) {
-            totals.merge(expense.getCategory(), expense.getAmount(), Double::sum);
-        }
-        return totals;
     }
 }

@@ -7,7 +7,6 @@ import com.expensetracker.model.User;
 import java.util.List;
 import java.util.Optional;
 
-// business logic for users - validates then delegates storage to UserDAO
 public class UserService {
 
     private final UserDAO userDAO;
@@ -26,12 +25,22 @@ public class UserService {
             throw new ExpenseTrackerException("Monthly budget cannot be negative.");
         }
 
+        // check DB for duplicate name before inserting
+        Optional<User> existing = userDAO.getByName(name.trim());
+        if (existing.isPresent()) {
+            throw new ExpenseTrackerException("User '" + name.trim() + "' already exists.");
+        }
+
         User user = new User(name.trim(), monthlyBudget);
         return userDAO.insert(user);
     }
 
     public Optional<User> getUserById(int id) throws ExpenseTrackerException {
         return userDAO.getById(id);
+    }
+
+    public Optional<User> getUserByName(String name) throws ExpenseTrackerException {
+        return userDAO.getByName(name);
     }
 
     public void updateBudget(int userId, double newBudget) throws ExpenseTrackerException {
@@ -41,7 +50,6 @@ public class UserService {
         userDAO.updateBudget(userId, newBudget);
     }
 
-    // remaining = budget - total spent
     public double getRemainingBudget(int userId) throws ExpenseTrackerException {
         User user = userDAO.getById(userId)
                 .orElseThrow(() -> new ExpenseTrackerException("User with ID " + userId + " not found."));

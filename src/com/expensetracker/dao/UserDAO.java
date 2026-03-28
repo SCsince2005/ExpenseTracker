@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// handles all database operations for the users table
 public class UserDAO {
 
     public User insert(User user) throws ExpenseTrackerException {
@@ -22,7 +21,6 @@ public class UserDAO {
             pstmt.setDouble(2, user.getMonthlyBudget());
             pstmt.executeUpdate();
 
-            // grab the auto-generated id and set it on the object
             ResultSet keys = pstmt.getGeneratedKeys();
             if (keys.next()) {
                 user.setId(keys.getInt(1));
@@ -48,6 +46,24 @@ public class UserDAO {
 
         } catch (SQLException e) {
             throw new ExpenseTrackerException("Failed to fetch user: " + e.getMessage(), e);
+        }
+    }
+
+    // case-insensitive name lookup
+    public Optional<User> getByName(String name) throws ExpenseTrackerException {
+        String sql = "SELECT id, name, monthly_budget FROM users WHERE LOWER(name) = LOWER(?)";
+
+        try (PreparedStatement pstmt = DBConnection.getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, name.trim());
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(mapRow(rs));
+            }
+            return Optional.empty();
+
+        } catch (SQLException e) {
+            throw new ExpenseTrackerException("Failed to fetch user by name: " + e.getMessage(), e);
         }
     }
 
@@ -85,7 +101,6 @@ public class UserDAO {
         }
     }
 
-    // maps a ResultSet row to a User object
     private User mapRow(ResultSet rs) throws SQLException {
         return new User(
                 rs.getInt("id"),
