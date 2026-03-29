@@ -46,17 +46,14 @@ public class ExpenseService {
         return expenseDAO.getMonthlyTotal(userId, year, month);
     }
 
-    // category-wise breakdown for all time
     public Map<Category, Double> getCategoryWiseTotals(int userId) throws ExpenseTrackerException {
         return buildCategoryMap(getExpensesByUser(userId));
     }
 
-    // category-wise breakdown for a specific month
     public Map<Category, Double> getMonthlyReport(int userId, int year, int month) throws ExpenseTrackerException {
         return buildCategoryMap(getMonthlyExpenses(userId, year, month));
     }
 
-    // reusable helper that takes any list and groups by category using HashMap
     private Map<Category, Double> buildCategoryMap(List<Expense> expenses) {
         Map<Category, Double> totals = new HashMap<>();
         for (Expense expense : expenses) {

@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-// Singleton class - manages a single shared SQLite connection
 public class DBConnection {
 
     private static final String URL = "jdbc:sqlite:expensetracker.db";
@@ -13,20 +12,18 @@ public class DBConnection {
 
     private DBConnection() {}
 
-    // synchronized so multiple threads don't create duplicate connections
     public static synchronized Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
             try {
                 Class.forName("org.sqlite.JDBC");
             } catch (ClassNotFoundException e) {
-                throw new SQLException("SQLite JDBC driver not found. Check classpath.", e);
+                throw new SQLException("SQLite JDBC driver not found.", e);
             }
             connection = DriverManager.getConnection(URL);
         }
         return connection;
     }
 
-    // creates tables if they don't already exist (safe to call multiple times)
     public static void initializeDatabase() throws SQLException {
         String createUsersTable = "CREATE TABLE IF NOT EXISTS users ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, "

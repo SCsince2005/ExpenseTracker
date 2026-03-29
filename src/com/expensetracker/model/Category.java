@@ -1,6 +1,5 @@
 package com.expensetracker.model;
 
-// Enum for expense categories - restricts input to valid types only
 public enum Category {
     FOOD("Food & Dining"),
     TRANSPORT("Transport & Travel"),

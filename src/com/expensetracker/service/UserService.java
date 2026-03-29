@@ -4,6 +4,7 @@ import com.expensetracker.dao.UserDAO;
 import com.expensetracker.exception.ExpenseTrackerException;
 import com.expensetracker.model.User;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +26,6 @@ public class UserService {
             throw new ExpenseTrackerException("Monthly budget cannot be negative.");
         }
 
-        // check DB for duplicate name before inserting
         Optional<User> existing = userDAO.getByName(name.trim());
         if (existing.isPresent()) {
             throw new ExpenseTrackerException("User '" + name.trim() + "' already exists.");
@@ -54,8 +54,14 @@ public class UserService {
         User user = userDAO.getById(userId)
                 .orElseThrow(() -> new ExpenseTrackerException("User with ID " + userId + " not found."));
 
-        double totalSpent = expenseService.getTotalByUser(userId);
-        return user.getMonthlyBudget() - totalSpent;
+        LocalDate now = LocalDate.now();
+        double monthlySpent = expenseService.getMonthlyTotal(userId, now.getYear(), now.getMonthValue());
+        return user.getMonthlyBudget() - monthlySpent;
+    }
+
+    public double getCurrentMonthSpending(int userId) throws ExpenseTrackerException {
+        LocalDate now = LocalDate.now();
+        return expenseService.getMonthlyTotal(userId, now.getYear(), now.getMonthValue());
     }
 
     public List<User> getAllUsers() throws ExpenseTrackerException {

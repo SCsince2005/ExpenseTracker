@@ -3,7 +3,6 @@ package com.expensetracker.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-// Maps to the 'expenses' table in the database
 public class Expense {
 
     private int id;
@@ -12,7 +11,6 @@ public class Expense {
     private double amount;
     private LocalDate date;
 
-    // for creating a new expense (id assigned by DB)
     public Expense(int userId, Category category, double amount, LocalDate date) {
         this.userId = userId;
         setCategory(category);
@@ -20,7 +18,6 @@ public class Expense {
         setDate(date);
     }
 
-    // for loading an existing expense from DB
     public Expense(int id, int userId, Category category, double amount, LocalDate date) {
         this.id = id;
         this.userId = userId;

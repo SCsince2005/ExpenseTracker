@@ -2,20 +2,17 @@ package com.expensetracker.model;
 
 import java.util.Objects;
 
-// Maps to the 'users' table in the database
 public class User {
 
     private int id;
     private String name;
     private double monthlyBudget;
 
-    // used when creating a new user (id gets assigned by the DB)
     public User(String name, double monthlyBudget) {
         setName(name);
         setMonthlyBudget(monthlyBudget);
     }
 
-    // used when loading an existing user from DB
     public User(int id, String name, double monthlyBudget) {
         this.id = id;
         setName(name);
@@ -43,7 +40,6 @@ public class User {
         this.monthlyBudget = monthlyBudget;
     }
 
-    // equals and hashCode based on id - needed for collections like HashMap/HashSet
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

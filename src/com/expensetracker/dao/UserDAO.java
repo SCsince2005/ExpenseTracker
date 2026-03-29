@@ -49,7 +49,6 @@ public class UserDAO {
         }
     }
 
-    // case-insensitive name lookup
     public Optional<User> getByName(String name) throws ExpenseTrackerException {
         String sql = "SELECT id, name, monthly_budget FROM users WHERE LOWER(name) = LOWER(?)";
 

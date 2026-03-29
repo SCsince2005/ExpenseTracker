@@ -63,7 +63,6 @@ public class ExpenseDAO {
         });
     }
 
-    // filters by year and month using date range (e.g. 2026-03-01 to 2026-03-31)
     public List<Expense> getByUserAndMonth(int userId, int year, int month) throws ExpenseTrackerException {
         String sql = "SELECT id, user_id, category, amount, date FROM expenses "
                 + "WHERE user_id = ? AND date BETWEEN ? AND ?";
@@ -97,7 +96,6 @@ public class ExpenseDAO {
         });
     }
 
-    // helper to avoid repeating the same query-and-map pattern
     private List<Expense> queryList(String sql, ParamSetter setter) throws ExpenseTrackerException {
         List<Expense> expenses = new ArrayList<>();
         try (PreparedStatement pstmt = DBConnection.getConnection().prepareStatement(sql)) {
@@ -122,7 +120,6 @@ public class ExpenseDAO {
         }
     }
 
-    // functional interface for setting PreparedStatement parameters
     @FunctionalInterface
     private interface ParamSetter {
         void setParams(PreparedStatement pstmt) throws SQLException;
